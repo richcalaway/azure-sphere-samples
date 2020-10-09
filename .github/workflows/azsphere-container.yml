@@ -21,12 +21,12 @@ jobs:
 
     - name: Build image for azsphere builds and Start container from build image 
       run: | 
-        docker build --target build -t hlbuildimage -f Samples/HelloWorld/HelloWorld_HighLevelApp/.devcontainer/Dockerfile . 
-        docker run --name hlbuildcontainer hlbuildimage 
+        docker build --target azsphere-sampleapp-build --tag azsphere-sampleapp-build -f Samples/HelloWorld/HelloWorld_HighLevelApp/.devcontainer/Dockerfile . 
+        docker run --name hello_hl azsphere-sampleapp-build
 
     - name: Copy container build output 
       run: 
-        docker cp hlbuildcontainer:/build HLOutput 
+        docker cp hello_hl:/build HLOutput 
 
     - name: Publish HL imagepackage 
       uses: actions/upload-artifact@v2 
