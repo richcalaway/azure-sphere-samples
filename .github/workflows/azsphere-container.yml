@@ -10,24 +10,27 @@ on:
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+jobs: 
+  build: 
+    runs-on: ubuntu-latest 
+    name: Build Azure Sphere Apps 
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+    steps: 
+    - name: Checkout 
+      uses: actions/checkout@v2 
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+    - name: Build image for azsphere builds and Start container from build image 
+      run: | 
+        docker build --target build -t hlbuildimage -f Samples/HelloWorld/HelloWorld_HighLevelApp/.devcontainer/Dockerfile . 
+        docker run --name hlbuildcontainer hlbuildimage 
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+    - name: Copy container build output 
+      run: 
+        docker cp hlbuildcontainer:/build HLOutput 
+
+    - name: Publish HL imagepackage 
+      uses: actions/upload-artifact@v2 
+      with: 
+        name: HL imagepackage 
+        path: ${{ github.workspace }}/HLOutput/HelloWorld_HighLevelApp.imagepackage 
+
